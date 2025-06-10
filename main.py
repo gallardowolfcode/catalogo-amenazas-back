@@ -18,10 +18,15 @@ models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
 app.include_router(opciones.router, prefix="/options", tags=["Opciones"])
 
-# Permitir acceso desde cualquier frontend temporalmente
+# Agrega esto:
+origins = [
+    "https://catalogoamenazas.netlify.app",  # Tu frontend en Netlify
+    "http://localhost:3000"  # Opcional, si usas React local
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=origins,  # Permitir solo estos orígenes
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

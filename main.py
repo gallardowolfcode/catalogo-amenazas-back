@@ -114,21 +114,18 @@ def export_threats_csv(
 ):
     data = crud.get_threats(db, skip=0, limit=10_000, severidad=severidad, prioridad=prioridad, tipo_incidente=tipo_incidente)["items"]
 
-    output = io.StringIO(newline='', encoding='utf-8-sig')  # <- Aquí está el cambio clave
+    output = io.StringIO()
+    # Escribe BOM para UTF-8
+    output.write('\ufeff')
+
     writer = csv.writer(output)
     writer.writerow(["Amenaza", "Tipo de Incidente", "Severidad", "Prioridad", "Fuentes de Detección"])
     for threat in data:
-        writer.writerow([
-            threat.amenaza,
-            threat.tipo_incidente,
-            threat.severidad,
-            threat.prioridad,
-            threat.fuentes_deteccion
-        ])
+        writer.writerow([threat.amenaza, threat.tipo_incidente, threat.severidad, threat.prioridad, threat.fuentes_deteccion])
 
     output.seek(0)
     return StreamingResponse(
         output,
-        media_type="text/csv",
+        media_type="text/csv; charset=utf-8",
         headers={"Content-Disposition": "attachment; filename=amenazas.csv"}
     )
